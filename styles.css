@@ -121,6 +121,13 @@ p{margin:0 0 1em}
 
 /* 3. Request a visit */
 .visit{background:var(--mist)}
+/* Request a visit: extra room on top because the fixed 76px header covers the top of the band as it scrolls in;
+   less on the bottom so the content sits centered in what's visible. On two columns, the photo matches the text height. */
+.section.visit{padding:calc(clamp(72px,10vw,120px) + 30px) 0 clamp(60px,7vw,90px)}
+@media (min-width:981px){
+  .visit-grid .visit-photo{position:relative;align-self:stretch;aspect-ratio:auto;min-height:320px}
+  .visit-grid .visit-photo img{position:absolute;inset:0}
+}
 .visit-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(36px,6vw,80px);align-items:start}
 .visit-text .eyebrow{line-height:1;margin-bottom:.8em}
 .visit-text p:not(.lead):not(.eyebrow):not(.verse){color:var(--slate)}
