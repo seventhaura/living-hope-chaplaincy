@@ -31,6 +31,139 @@
     document.querySelector('.form-msg').textContent = 'Thank you! (Sign-up is not connected yet in this preview.)';
   });
 
+  // Partners page: "Talk with us" links pre-select the topic; ?about=hospital|church works too
+  var about = document.getElementById('pf-about');
+  var topics = { hospital: 'Hospital partnership', church: 'Church partnership', other: 'Other' };
+  if (about) {
+    document.querySelectorAll('[data-topic]').forEach(function (a) {
+      a.addEventListener('click', function () { about.value = topics[a.getAttribute('data-topic')] || ''; });
+    });
+    var q = new URLSearchParams(location.search).get('about');
+    if (q && topics[q]) about.value = topics[q];
+  }
+
+  // Partners page: contact form. Static site, so it posts to data-endpoint if one is set
+  // (e.g. Formspree); otherwise it shows the thank-you state and says nothing was sent.
+  var pform = document.getElementById('partner-form');
+  if (pform) {
+    var errBox = pform.querySelector('.form-error');
+    var thanks = document.getElementById('form-thanks');
+    var btn = pform.querySelector('button[type="submit"]');
+    function showThanks(note) {
+      pform.hidden = true; thanks.hidden = false;
+      if (note) {
+        var p = document.createElement('p'); p.className = 'form-note'; p.textContent = note; thanks.appendChild(p);
+      }
+      thanks.focus();
+    }
+    pform.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errBox.hidden = true;
+      var bad = [];
+      pform.querySelectorAll('[required]').forEach(function (f) {
+        var ok = f.value.trim() !== '' && (f.type !== 'email' || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value.trim()));
+        f.setAttribute('aria-invalid', ok ? 'false' : 'true');
+        if (!ok) bad.push(f);
+      });
+      if (bad.length) {
+        errBox.textContent = 'Please fill in your name, a valid email, and what you are reaching out about.';
+        errBox.hidden = false; bad[0].focus(); return;
+      }
+      if (pform.querySelector('[name="_gotcha"]').value) return; // likely a bot
+      var endpoint = pform.getAttribute('data-endpoint');
+      if (!endpoint) { showThanks('Preview note: this form is not connected yet, so nothing was sent.'); return; }
+      btn.disabled = true; btn.textContent = 'Sending…';
+      fetch(endpoint, { method: 'POST', body: new FormData(pform), headers: { Accept: 'application/json' } })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); showThanks(); })
+        .catch(function () {
+          btn.disabled = false; btn.textContent = 'Send message';
+          errBox.textContent = 'Sorry, your message could not be sent. Please try again or call (832) 916-4555.';
+          errBox.hidden = false;
+        });
+    });
+  }
+
+  // Partners and volunteer pages: highlight the switcher button for the section in view.
+  // On the volunteer page both buttons point into the forms section, so the visible tab wins.
+  var switches = Array.prototype.slice.call(document.querySelectorAll('.switch-btn'));
+  var currentSec = null;
+  function markSwitches() {
+    switches.forEach(function (s) {
+      var el = document.getElementById(s.getAttribute('href').slice(1));
+      var on = !!el && !!currentSec && (el.closest('section.section') || el) === currentSec && !el.hidden;
+      s.classList.toggle('is-active', on);
+    });
+  }
+  if (switches.length && 'IntersectionObserver' in window) {
+    var so = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) currentSec = en.target;
+        else if (currentSec === en.target) currentSec = null;
+      });
+      markSwitches();
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    switches.forEach(function (s) {
+      var el = document.getElementById(s.getAttribute('href').slice(1));
+      if (el) so.observe(el.closest('section.section') || el);
+    });
+  }
+
+  // Volunteer page: "Join the team" / "Log a visit" tabs. Without JS both panels simply show.
+  // Links to #join or #log-visit (from anywhere on the page or another page) open the right tab.
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.form-tab'));
+  if (tabs.length) {
+    var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+    var tabWrap = tabs[0].closest('.section');
+    tabWrap.classList.add('tabs-ready');
+    function selectTab(i, focusTab) {
+      tabs.forEach(function (t, j) {
+        var on = i === j;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        panels[j].hidden = !on;
+      });
+      if (focusTab) tabs[i].focus();
+      markSwitches();
+    }
+    function panelIndex(hash) {
+      var id = (hash || '').replace('#', '');
+      for (var i = 0; i < panels.length; i++) if (panels[i].id === id) return i;
+      return -1;
+    }
+    function openFromHash(hash, smooth) {
+      var i = panelIndex(hash);
+      if (i < 0) return false;
+      selectTab(i);
+      panels[i].scrollIntoView({ behavior: smooth && !reduce.matches ? 'smooth' : 'auto', block: 'start' });
+      return true;
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { selectTab(i); history.replaceState(null, '', '#' + panels[i].id); });
+      t.addEventListener('keydown', function (e) {
+        var k = e.key, n = tabs.length, j = -1;
+        if (k === 'ArrowRight' || k === 'ArrowDown') j = (i + 1) % n;
+        else if (k === 'ArrowLeft' || k === 'ArrowUp') j = (i - 1 + n) % n;
+        else if (k === 'Home') j = 0;
+        else if (k === 'End') j = n - 1;
+        if (j < 0) return;
+        e.preventDefault(); selectTab(j, true);
+      });
+    });
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#"]');
+      if (!a || panelIndex(a.getAttribute('href')) < 0) return;
+      e.preventDefault();
+      history.pushState(null, '', a.getAttribute('href'));
+      openFromHash(a.getAttribute('href'), true);
+    });
+    window.addEventListener('hashchange', function () { openFromHash(location.hash, true); });
+    selectTab(Math.max(0, panelIndex(location.hash)));
+    if (panelIndex(location.hash) >= 0) {
+      // wait for layout (fonts, lazy images) before jumping to the panel
+      window.addEventListener('load', function () { openFromHash(location.hash, false); });
+    }
+  }
+
   // Gentle reveal as each section enters
   var reveals = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduce.matches) {
@@ -54,6 +187,7 @@
     var sy = window.scrollY;
 
     if (reduce.matches) { header.classList.add('is-visible'); return; }
+    if (!intro) header.classList.add('is-visible');
 
     // Opening: pinned, scroll-scrubbed push into the tree
     var p = 0;
@@ -82,7 +216,7 @@
     }
 
     // Header slides in once the opening is done
-    header.classList.toggle('is-visible', intro ? sy > (intro.offsetHeight - vh) * 0.95 : sy > 40);
+    header.classList.toggle('is-visible', intro ? sy > (intro.offsetHeight - vh) * 0.95 : true);
 
     // Photos gently settle (zoom out) as they move through the viewport
     zooms.forEach(function (img) {
