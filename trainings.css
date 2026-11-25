@@ -1,0 +1,95 @@
+/* Living Hope Chaplaincy — trainings.html only (volunteer chaplain training hub).
+   Shared header, footer, hero, steps, buttons and form fields come from styles.css.
+   To remove the page, delete trainings.html and this file (see README, "Trainings page"). */
+
+.nowrap{white-space:nowrap}
+
+/* Course library */
+.courses-section{background:var(--mist)}
+.lesson-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.lesson{display:flex;flex-direction:column;background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 0 rgba(26,39,68,.05),0 14px 30px -24px rgba(26,39,68,.45)}
+.lesson-featured{grid-column:1/-1;display:grid;grid-template-columns:1.25fr 1fr;align-items:center}
+.lesson-video{position:relative;aspect-ratio:16/9;background:var(--navy)}
+.lesson-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:var(--navy);cursor:pointer;display:block}
+.video-play img{width:100%;height:100%;object-fit:cover;opacity:.92;transition:opacity .3s,transform .6s var(--ease)}
+.video-play::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,44,112,0) 40%,rgba(2,44,112,.35) 100%)}
+.play-icon{position:absolute;left:50%;top:50%;z-index:1;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.94);color:var(--blue);box-shadow:0 12px 26px -10px rgba(0,0,0,.5);transition:transform .3s var(--ease),background-color .3s,color .3s}
+.play-icon svg{width:28px;height:28px;margin-left:3px}
+.video-play:hover img{opacity:1;transform:scale(1.03)}
+.video-play:hover .play-icon,.video-play:focus-visible .play-icon{transform:scale(1.08);background:var(--blue);color:#fff}
+.video-play:focus-visible{outline:3px solid var(--lime);outline-offset:-3px;border-radius:0}
+.lesson-featured .play-icon{width:78px;height:78px;margin:-39px 0 0 -39px}
+.lesson-body{padding:20px 22px 24px}
+.lesson-featured .lesson-body{padding:clamp(24px,4vw,44px)}
+.lesson-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 .5em;font-size:.92rem}
+.lesson-num{font-weight:600;color:var(--green)}
+.lesson-count{color:var(--slate);font-size:.88rem}
+.lesson h3{font-size:1.45rem;margin:0 0 .3em}
+.lesson-featured h3{font-size:clamp(1.8rem,2.6vw,2.3rem)}
+.lesson-body>p:last-child{color:var(--slate);margin:0}
+
+/* Quiz */
+.quiz-container{max-width:860px}
+.quiz-card{background:#fff;border-radius:28px;padding:clamp(22px,4vw,44px);box-shadow:0 1px 0 rgba(26,39,68,.05),var(--shadow)}
+.quiz-who{padding-bottom:24px;margin-bottom:8px;border-bottom:1px solid rgba(26,39,68,.08)}
+.quiz-q{border:0;margin:0;padding:22px 0;border-bottom:1px solid rgba(26,39,68,.08);min-width:0}
+.q-legend{display:grid;grid-template-columns:auto 1fr;column-gap:14px;row-gap:2px;padding:0;margin:0 0 14px;width:100%}
+.q-num{grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:600;font-size:.95rem}
+.q-kind{font-size:.85rem;font-weight:600;color:var(--green)}
+.q-text{font-weight:600;color:var(--navy);line-height:1.45}
+.q-body{padding-left:48px}
+.q-options{display:grid;gap:8px}
+.q-options-tf{grid-template-columns:repeat(2,minmax(0,180px))}
+.q-option{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-radius:12px;border:1px solid rgba(26,39,68,.14);background:var(--parchment);cursor:pointer;transition:border-color .2s,background-color .2s}
+.q-option:hover{border-color:var(--blue)}
+.q-option input{margin:.3em 0 0;accent-color:var(--blue);flex:none;width:17px;height:17px}
+.q-option:has(input:checked){border-color:var(--blue);background:#fff;box-shadow:0 0 0 2px rgba(5,68,164,.15)}
+.q-option:has(input:focus-visible){outline:3px solid var(--blue);outline-offset:2px}
+.quiz-q textarea{width:100%;font:inherit;font-size:1rem;color:var(--navy);background:var(--parchment);border:1px solid rgba(26,39,68,.18);border-radius:12px;padding:12px 14px;resize:vertical;min-height:96px}
+.quiz-q textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(5,68,164,.18)}
+.quiz-q.is-missing .q-num{background:#9b2c2c}
+.quiz-q.is-missing .q-text::after{content:" (please answer)";font-weight:400;color:#9b2c2c}
+.quiz-q [aria-invalid="true"]{border-color:#9b2c2c}
+.q-feedback{margin:12px 0 0 48px;padding:10px 14px;border-radius:12px;font-size:.98rem;line-height:1.5}
+.q-feedback strong{font-weight:600}
+.quiz-q.is-right .q-feedback{background:#eef5ea;color:#244a1e}
+.quiz-q.is-wrong .q-feedback{background:#fbf3ea;color:#6b4a1f}
+.quiz-q.is-review .q-feedback{background:#eef2f9;color:var(--blue-deep)}
+.quiz-q.is-right .q-num{background:var(--green)}
+.quiz-q.is-wrong .q-num{background:#b7791f}
+.q-option.is-answer{border-color:var(--green);background:#f3f8f0}
+.quiz-q.is-done .q-option{cursor:default}
+.quiz-submit{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:22px}
+.quiz-submit .form-note{margin:0;max-width:440px}
+.quiz-card .form-error{margin:18px 0 0}
+.quiz-result{text-align:center;margin-top:28px;padding:30px 20px;border-radius:22px;background:var(--parchment)}
+.quiz-result:focus{outline:none}
+.quiz-result img{width:60px;margin:0 auto 10px}
+.quiz-score{font-size:clamp(1.9rem,3vw,2.4rem);margin-bottom:.3em}
+.quiz-score-note{color:var(--slate);max-width:520px;margin:0 auto 1em}
+.quiz-result .btn{margin-top:4px}
+
+/* Closing */
+.training-closing{padding-top:0;background:var(--parchment)}
+.closing-note{text-align:center;max-width:640px;margin:0 auto;padding:clamp(28px,4vw,40px);border-top:1px solid rgba(26,39,68,.1)}
+.closing-note h2{font-size:clamp(1.7rem,2.6vw,2.2rem)}
+.closing-note p{color:var(--slate);margin:0}
+.closing-note a{font-weight:600}
+
+@media (max-width:980px){
+  .lesson-grid{grid-template-columns:repeat(2,1fr)}
+  .lesson-featured{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .lesson-grid{grid-template-columns:1fr}
+  .q-body{padding-left:0}
+  .q-feedback{margin-left:0}
+  .q-options-tf{grid-template-columns:1fr 1fr}
+  .quiz-submit{flex-direction:column;align-items:stretch}
+  .quiz-submit .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .video-play img,.play-icon{transition:none}
+  .video-play:hover img{transform:none}
+}
