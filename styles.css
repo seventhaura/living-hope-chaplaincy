@@ -121,7 +121,8 @@ p{margin:0 0 1em}
 
 /* 3. Request a visit */
 .visit{background:var(--mist)}
-.visit-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(36px,6vw,80px);align-items:center}
+.visit-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(36px,6vw,80px);align-items:start}
+.visit-text .eyebrow{line-height:1;margin-bottom:.8em}
 .visit-text p:not(.lead):not(.eyebrow):not(.verse){color:var(--slate)}
 .visit-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:28px 0 24px}
 .phone-card{display:inline-flex;align-items:center;gap:14px;padding:10px 22px 10px 10px;background:#fff;border-radius:999px;text-decoration:none;color:var(--navy);box-shadow:0 10px 24px -18px rgba(26,39,68,.5)}
@@ -131,6 +132,8 @@ p{margin:0 0 1em}
 .phone-card strong{font-size:1.2rem;line-height:1.2}
 .verse{font-family:var(--serif);font-size:1.2rem;color:var(--green);margin:0}
 .verse span{font-family:var(--sans);font-size:.88rem;color:var(--slate);margin-left:.3em}
+.visit-text .verse{font-size:clamp(1.35rem,1.2rem + .45vw,1.5rem);line-height:1.35}
+.visit-text .verse span{font-size:.95rem}
 .visit-photo{border-radius:28px;box-shadow:var(--shadow);aspect-ratio:4/3.4}
 .visit-photo img{width:100%;height:100%;object-fit:cover;object-position:60% 50%}
 
@@ -300,8 +303,8 @@ section[id],[id="contact-us"]{scroll-margin-top:96px}
 .section-head p:not(.eyebrow){color:var(--slate)}
 .offer-list{list-style:none;margin:clamp(40px,6vw,64px) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .offer-list li{display:flex;align-items:center;gap:14px;background:#fff;border-radius:var(--radius);padding:18px 20px;font-family:var(--serif);font-size:1.35rem;font-weight:600;line-height:1.2;box-shadow:0 1px 0 rgba(26,39,68,.05),0 14px 30px -24px rgba(26,39,68,.45)}
-.offer-icon,.req-icon{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--mist);color:var(--green)}
-.offer-icon svg,.req-icon svg{width:22px;height:22px}
+.offer-icon,.req-icon{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--mist);color:var(--green)}
+.offer-icon svg,.req-icon svg{width:18px;height:18px}
 .page-volunteer .pledge{margin-top:22px}
 .req-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .req-card{background:#fff;border-radius:var(--radius);padding:26px;box-shadow:0 1px 0 rgba(26,39,68,.05),0 14px 30px -24px rgba(26,39,68,.45)}
@@ -405,3 +408,6 @@ section[id],[id="contact-us"]{scroll-margin-top:96px}
   .zoom{transform:none}
   .site-header{transform:none}
 }
+
+.page-hero-home{display:inline-block;border-radius:12px}
+.page-hero-home:focus-visible{outline:2px solid var(--blue);outline-offset:4px}

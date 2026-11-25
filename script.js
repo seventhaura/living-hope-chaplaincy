@@ -33,7 +33,7 @@
 
   // Partners page: "Talk with us" links pre-select the topic; ?about=hospital|church works too
   var about = document.getElementById('pf-about');
-  var topics = { hospital: 'Hospital partnership', church: 'Church partnership', other: 'Other' };
+  var topics = { hospital: 'Hospital partnership', church: 'Church partnership', visit: 'Request a visit', other: 'Other' };
   if (about) {
     document.querySelectorAll('[data-topic]').forEach(function (a) {
       a.addEventListener('click', function () { about.value = topics[a.getAttribute('data-topic')] || ''; });
