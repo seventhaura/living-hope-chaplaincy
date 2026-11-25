@@ -6,6 +6,8 @@ A single static homepage built to Steven's wireframe. Plain HTML, CSS, and JavaS
 index.html     the homepage
 partners.html  Partner with us (hospitals + churches), with a contact form
 volunteer.html Volunteer page: what it takes, how to join, and the two volunteer forms
+trainings.html Volunteer chaplain training hub (10 videos + certification quiz); will become a hidden page
+trainings.css  styles used only by trainings.html
 styles.css     all styling (colors, fonts, layout, animations)
 script.js      the scroll effects, menu, and section reveals
 images/        logo, tree, and photos (already compressed for the web)
@@ -25,7 +27,7 @@ images/        logo, tree, and photos (already compressed for the web)
 1. Sign in at https://github.com and click **New** (or the **+** menu, then **New repository**).
 2. Name it, for example `living-hope-chaplaincy`. Choose **Public** (free GitHub Pages needs a public repo). Click **Create repository**.
 3. On the new repo page, click **uploading an existing file**.
-4. Unzip `living-hope-site-v2.zip` on your computer, select **everything it contains** (`index.html`, `partners.html`, `volunteer.html`, `styles.css`, `script.js`, `README.md`, `.nojekyll`, and the `images` folder) and drag it into the upload area.
+4. Unzip `living-hope-site-v2.zip` on your computer, select **everything it contains** (`index.html`, `partners.html`, `volunteer.html`, `trainings.html`, `trainings.css`, `styles.css`, `script.js`, `README.md`, `.nojekyll`, and the `images` folder) and drag it into the upload area.
    - `.nojekyll` is a hidden file. On a Mac press **Cmd + Shift + .** in Finder to show it; on Windows turn on **View > Hidden items**. If it doesn't upload, the site still works; it's a safety net.
    - `index.html` must be at the top level of the repo, not inside a subfolder.
 5. Click **Commit changes**.
@@ -101,3 +103,19 @@ No form yet for one of the tabs? Add the class `is-coming-soon` to its `.embed-s
 Links into this page: `volunteer.html#join` and `volunteer.html#log-visit` open the matching tab and scroll to it (the partners page uses `volunteer.html#join`). The page's "Send us a message" button goes to `partners.html?about=other#contact-us`.
 
 Note: the reporting form used to live on a page that wasn't in the site menu. The "Log a visit" tab makes it reachable from the public volunteer page. That's what was asked for; just be aware anyone can open it.
+
+## Trainings page (trainings.html)
+
+The training hub for new volunteers: a welcome, "How it works", 10 training videos (Personal intro, Introduction, Modules 1–6, Next steps, Personal outro), and a 10-question certification quiz. It already has `<meta name="robots" content="noindex, nofollow">`, so search engines won't list it.
+
+- **Videos (demo).** All 10 cards play the same placeholder YouTube video (`1e6PSNHpo4g`). The titles are the real module names; the one-line descriptions are placeholders. For each real video, change the card's `data-video-id` and its thumbnail `src` (`https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg`). Videos load only when someone presses play.
+- **Quiz (demo).** It's scored in the browser: true/false and multiple-choice answers get a score and gentle feedback; the two written answers say "reviewed by our team." Nothing is sent anywhere yet. To collect results, put a form service endpoint (e.g. Formspree) in `data-endpoint` on `<form id="training-quiz">`; `script.js` will then POST the name, email, score, and every answer. To change an answer key, edit the question's `data-answer` (0 = first option) and `data-explain`.
+
+### Making the page hidden (link-only) later
+
+1. Remove the Trainings menu link from the header of `index.html`, `about.html`, `partners.html`, `volunteer.html` and `trainings.html`. Each one is wrapped in
+   `<!-- TRAININGS NAV LINK (temporary, remove when page goes hidden) -->` … `<!-- /TRAININGS NAV LINK -->`; delete those three lines.
+2. Optional: with one fewer link, the header has room again, so you can change `@media (max-width:1120px)` (the "Header nav" block in `styles.css`) back to `980px`.
+3. Keep `trainings.html` and `trainings.css` in the repo and share the link directly (`…/trainings.html`). The noindex tag stays. Note: GitHub Pages is public, so anyone with the link can open it; it is hidden, not protected.
+
+To delete the page entirely: do step 1, then delete `trainings.html` and `trainings.css`. Its code in `script.js` (the "Trainings page" block) does nothing on other pages, so it can stay or be removed.

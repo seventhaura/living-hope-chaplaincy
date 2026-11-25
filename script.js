@@ -177,6 +177,129 @@
     }
   }
 
+  // ===== Trainings page (trainings.html): lazy video players and the certification quiz =====
+  // Everything below does nothing on pages without these elements.
+  document.querySelectorAll('.video-play[data-video-id]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-video-id');
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
+      f.title = btn.getAttribute('data-video-title') || 'Lesson video';
+      f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      f.allowFullscreen = true;
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      btn.replaceWith(f);
+      f.focus();
+    });
+  });
+
+  var quiz = document.getElementById('training-quiz');
+  if (quiz) {
+    var qs = Array.prototype.slice.call(quiz.querySelectorAll('.quiz-q'));
+    var qErr = quiz.querySelector('.form-error');
+    var qResult = document.getElementById('quiz-result');
+    var qSubmit = quiz.querySelector('.quiz-submit');
+    var qName = document.getElementById('tq-name');
+    var qEmail = document.getElementById('tq-email');
+    function answered(q) {
+      if (q.getAttribute('data-type') === 'text') return q.querySelector('textarea').value.trim() !== '';
+      return !!q.querySelector('input:checked');
+    }
+    function lock(on) {
+      quiz.querySelectorAll('.quiz-q input, .quiz-q textarea, .quiz-who input').forEach(function (el) {
+        if (el.tagName === 'TEXTAREA' || el.type === 'text' || el.type === 'email') el.readOnly = on; else el.disabled = on;
+      });
+    }
+    quiz.addEventListener('change', function (e) {
+      var q = e.target.closest('.quiz-q'); if (q && answered(q)) q.classList.remove('is-missing');
+    });
+    quiz.addEventListener('input', function (e) {
+      var q = e.target.closest('.quiz-q'); if (q && answered(q)) q.classList.remove('is-missing');
+    });
+    quiz.addEventListener('submit', function (e) {
+      e.preventDefault();
+      qErr.hidden = true;
+      var firstBad = null;
+      [qName, qEmail].forEach(function (f) {
+        var ok = fieldOk(f);
+        f.setAttribute('aria-invalid', ok ? 'false' : 'true');
+        if (!ok && !firstBad) firstBad = f;
+      });
+      var missing = qs.filter(function (q) { var m = !answered(q); q.classList.toggle('is-missing', m); return m; });
+      if (firstBad || missing.length) {
+        var parts = [];
+        if (firstBad) parts.push('your name and a valid email');
+        if (missing.length) parts.push(missing.length === 1 ? 'question ' + missing[0].id.slice(1) : missing.length + ' questions (' + missing.map(function (q) { return q.id.slice(1); }).join(', ') + ')');
+        qErr.textContent = 'Please fill in ' + parts.join(' and ') + '.';
+        qErr.hidden = false;
+        var target = firstBad || missing[0].querySelector('input, textarea');
+        target.focus();
+        return;
+      }
+      var right = 0, scored = 0;
+      qs.forEach(function (q) {
+        var fb = q.querySelector('.q-feedback');
+        q.classList.remove('is-right', 'is-wrong', 'is-review');
+        q.classList.add('is-done');
+        if (q.getAttribute('data-type') === 'text') {
+          q.classList.add('is-review');
+          fb.innerHTML = '<strong>Thank you.</strong> Written answers are reviewed by our team.';
+        } else {
+          scored++;
+          var ans = q.getAttribute('data-answer');
+          var pick = q.querySelector('input:checked').value;
+          var ok = pick === ans;
+          if (ok) right++;
+          q.classList.add(ok ? 'is-right' : 'is-wrong');
+          var correct = q.querySelector('input[value="' + ans + '"]');
+          if (!ok && correct) correct.closest('.q-option').classList.add('is-answer');
+          var label = correct ? correct.nextElementSibling.textContent : '';
+          fb.innerHTML = '';
+          var strong = document.createElement('strong');
+          strong.textContent = ok ? 'That\u2019s right. ' : 'Not quite. The answer is \u201c' + label + '.\u201d ';
+          fb.appendChild(strong);
+          fb.appendChild(document.createTextNode(q.getAttribute('data-explain') || ''));
+        }
+        fb.hidden = false;
+      });
+      lock(true);
+      qSubmit.hidden = true;
+      qResult.querySelector('.quiz-score').textContent = 'You answered ' + right + ' of ' + scored + ' correctly';
+      qResult.querySelector('.quiz-score-note').textContent = (right === scored ? 'Wonderful work. ' : 'Thank you for taking the quiz. ') +
+        'Your two written answers will be reviewed by our team, and we\u2019ll follow up with you about next steps. You can scroll up to see feedback on each question.';
+      qResult.hidden = false;
+      qResult.focus();
+      var endpoint = quiz.getAttribute('data-endpoint');
+      if (!endpoint) { qResult.querySelector('.quiz-demo-note').hidden = false; return; }
+      var data = new FormData();
+      data.append('name', qName.value.trim()); data.append('email', qEmail.value.trim());
+      data.append('score', right + '/' + scored);
+      qs.forEach(function (q) {
+        var v = q.getAttribute('data-type') === 'text' ? q.querySelector('textarea').value.trim()
+          : q.querySelector('input:checked').nextElementSibling.textContent;
+        data.append(q.id + ' ' + q.querySelector('.q-text').textContent, v);
+      });
+      fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).catch(function () {
+        var n = qResult.querySelector('.quiz-demo-note');
+        n.textContent = 'Sorry, your answers could not be sent. Please call (832) 916-4555.'; n.hidden = false;
+      });
+    });
+    document.getElementById('quiz-retake').addEventListener('click', function () {
+      lock(false);
+      var keepName = qName.value, keepEmail = qEmail.value;
+      quiz.reset();
+      qName.value = keepName; qEmail.value = keepEmail; // keep who is taking it
+      qs.forEach(function (q) {
+        q.classList.remove('is-right', 'is-wrong', 'is-review', 'is-done', 'is-missing');
+        q.querySelector('.q-feedback').hidden = true;
+        q.querySelectorAll('.is-answer').forEach(function (o) { o.classList.remove('is-answer'); });
+      });
+      qResult.hidden = true; qSubmit.hidden = false;
+      qResult.querySelector('.quiz-demo-note').hidden = true;
+      qs[0].scrollIntoView({ behavior: reduce.matches ? 'auto' : 'smooth', block: 'center' });
+    });
+  }
+
   // Gentle reveal as each section enters
   var reveals = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduce.matches) {

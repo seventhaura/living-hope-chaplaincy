@@ -347,7 +347,6 @@ section[id],[id="contact-us"]{scroll-margin-top:96px}
   .steps-4{grid-template-columns:repeat(2,1fr);max-width:none}
   .form-panel{grid-template-columns:1fr}
   .contact-card{grid-template-columns:1fr}
-  .nav-actions{flex-direction:column;align-items:stretch}
 }
 @media (max-width:560px){
   .req-grid,.steps-4{grid-template-columns:1fr}
@@ -396,12 +395,17 @@ section[id],[id="contact-us"]{scroll-margin-top:96px}
 /* ===== End of Get in touch strip ===== */
 
 /* Responsive */
-@media (max-width:980px){
+/* Header nav: collapses into the menu button below 1120px (the nav has 6 links + 2 buttons) */
+@media (max-width:1120px){
   .menu-toggle{display:flex}
   .primary-nav{position:fixed;inset:76px 0 auto 0;flex-direction:column;align-items:stretch;gap:16px;padding:12px 24px 24px;background:#fff;box-shadow:0 20px 30px -20px rgba(26,39,68,.4);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .25s,transform .25s,visibility .25s}
   .primary-nav.is-open{opacity:1;visibility:visible;transform:none}
   .primary-nav ul{flex-direction:column}
   .primary-nav ul a{padding:14px 4px;font-size:1.1rem;border-bottom:1px solid rgba(26,39,68,.08);border-radius:0}
+  .primary-nav{max-height:calc(100vh - 76px);max-height:calc(100dvh - 76px);overflow-y:auto}
+  .nav-actions{flex-direction:column;align-items:stretch}
+}
+@media (max-width:980px){
   .mission-grid,.visit-grid,.resources-grid{grid-template-columns:1fr}
   .mission-photo{max-width:360px;margin-inline:auto}
   .visit-photo{order:-1;aspect-ratio:16/10}
