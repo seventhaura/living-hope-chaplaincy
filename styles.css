@@ -65,11 +65,26 @@ p{margin:0 0 1em}
 .intro-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
 .intro-glow{position:absolute;left:50%;top:40%;width:min(80vw,760px);aspect-ratio:1;transform:translate(-50%,-50%) scale(calc(1 + var(--p)*1.6));border-radius:50%;background:radial-gradient(circle,rgba(136,176,64,.24) 0%,rgba(5,68,164,.08) 42%,rgba(246,243,238,0) 70%);filter:blur(20px);opacity:calc(1 - var(--p)*.6);pointer-events:none}
 .intro-tree-wrap{position:relative;z-index:1;opacity:0;animation:slowFade 2.6s .2s var(--ease) forwards}
-.intro-tree{height:clamp(220px,46vh,460px);width:auto;
-  transform-origin:47% 40%; /* the point where the cross meets the canopy */
+.intro-tree{display:block;height:clamp(220px,46vh,460px);width:auto;aspect-ratio:1/1;overflow:visible;
+  transform-origin:53.7% 45.1%; /* where the cross bar meets the trunk */
   transform:scale(calc(1 + var(--z,0)));
-  opacity:calc(1 - var(--fade,0));
-  filter:drop-shadow(0 22px 36px rgba(5,68,164,.14));will-change:transform,opacity}
+  opacity:calc(1 - var(--fade,0))}
+/* Vector tree: every leaf and page is its own shape so it stays crisp at any zoom.
+   No will-change here on purpose: Chrome would rasterize once and upscale (blurry). */
+.tree-svg .lf{transform-box:view-box;
+  /* scroll-driven sway: a few degrees, staggered per leaf, growing as you push in */
+  transform:rotate(calc(sin(var(--sp,0) * 14rad + var(--i) * 1.3rad) * var(--amp,0) * 1deg))
+            translate(calc(var(--s) * var(--sp,0) * 14px), calc(var(--sp,0) * -6px));
+  animation:leafIdle 5.5s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -0.43s)}
+.intro.is-offscreen .tree-svg .lf{animation-play-state:paused}
+@keyframes leafIdle{from{rotate:-1.1deg}to{rotate:1.1deg}}
+.tree-svg .turn{transform-box:view-box;fill:#0A56A6;opacity:0;
+  /* front view of a page turn: it lifts a little at the spine, narrows, and lands mirrored on the left */
+  --lift:calc(var(--k) * (1 - var(--k)) * 4);
+  transform:translateY(calc(var(--lift) * -46px)) rotate(calc(var(--lift) * -9deg)) scaleX(calc(1 - 2 * var(--k)))}
+.tree-svg .turn-1{--k:var(--t1,0)}
+.tree-svg .turn-2{--k:var(--t2,0)}
+.tree-svg .turn.is-turning{opacity:1;fill:#3A78C2}
 .intro-text{position:relative;z-index:2;margin-top:clamp(14px,2.6vh,28px);opacity:calc(1 - var(--p)*3.2);transform:translateY(calc(var(--p)*60px))}
 .wordmark{font-size:clamp(2.4rem,5.4vw,4.4rem);font-weight:600;letter-spacing:.01em;margin:0 0 .12em;opacity:0;animation:fadeUp 1.6s 1.4s var(--ease) forwards}
 .wm-blue{color:var(--blue)}
@@ -231,6 +246,8 @@ p{margin:0 0 1em}
   .intro-sticky{position:relative;min-height:100svh;height:auto}
   .intro-tree-wrap,.wordmark,.intro-tag,.intro-ctas,.scroll-cue{opacity:1}
   .intro-tree{transform:none;opacity:1}
+  .tree-svg .lf,.tree-svg .turn{transform:none!important;rotate:none!important;animation:none!important}
+  .tree-svg .turn{opacity:0!important}
   .intro-text{opacity:1;transform:none}
   .intro-veil{display:none}
   .reveal{opacity:1;transform:none}

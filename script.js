@@ -5,6 +5,8 @@
   var header = document.getElementById('site-header');
   var intro = document.querySelector('.intro');
   var tree = document.querySelector('.intro-tree');
+  var turn1 = document.querySelector('.turn-1');
+  var turn2 = document.querySelector('.turn-2');
   var zooms = document.querySelectorAll('.zoom');
 
   var y = document.getElementById('year');
@@ -66,6 +68,17 @@
       tree.style.setProperty('--fade', clamp((p - 0.55) / 0.3).toFixed(3));
       intro.style.setProperty('--veil', clamp((p - 0.7) / 0.3).toFixed(3));
       intro.classList.toggle('is-moving', p > 0.02);
+      intro.classList.toggle('is-offscreen', p >= 1);
+      // leaves: sway amplitude (degrees) grows with the push-in, then settles
+      tree.style.setProperty('--sp', p.toFixed(4));
+      tree.style.setProperty('--amp', (Math.min(1, p * 6) * 5).toFixed(2));
+      // the open book: two pages turn, one after the other, early in the scroll
+      var t1 = clamp((p - 0.04) / 0.24), t2 = clamp((p - 0.16) / 0.24);
+      var e1 = t1 * t1 * (3 - 2 * t1), e2 = t2 * t2 * (3 - 2 * t2);
+      tree.style.setProperty('--t1', e1.toFixed(4));
+      tree.style.setProperty('--t2', e2.toFixed(4));
+      turn1.classList.toggle('is-turning', t1 > 0 && t1 < 1);
+      turn2.classList.toggle('is-turning', t2 > 0 && t2 < 1);
     }
 
     // Header slides in once the opening is done
