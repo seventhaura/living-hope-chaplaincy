@@ -51,7 +51,6 @@ Search `index.html` for `data-todo` to find each one.
 
 - **Subscribe form is not connected.** It shows a thank-you message but sends nothing. Connect it to the client's email service (for example Mailchimp, MailerLite, or Constant Contact) by pasting that service's form action URL into the `<form>` tag.
 - **Request a visit form.** The button links to the Living Hope Cognito Forms page (`cognitoforms.com/s/EoxqCCvV6kKb1FON8uzxSw`). On the current site, visit requests go through a GoDaddy form, and the Cognito forms found are the volunteer application and the volunteer reporting form. Confirm which Cognito form should take visit requests (or create one), then link or embed it directly.
-- **Book links** for God Heals, Be Healed, and Power Prayers are placeholders (`#`).
 - **Instagram** icon is a placeholder (`#`); the current site has no Instagram link. Replace or remove it.
 - **Future pages** linked from here that don't exist yet: `about.html` (Read more), `hospitals.html`, `churches.html`.
 - **Scripture PDFs** still load from the old GoDaddy site (12–18 MB each). Compress them, add them to this repo, and update the links, so they keep working after the domain moves.
