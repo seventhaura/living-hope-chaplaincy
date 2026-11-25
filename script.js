@@ -42,46 +42,59 @@
     if (q && topics[q]) about.value = topics[q];
   }
 
-  // Partners page: contact form. Static site, so it posts to data-endpoint if one is set
-  // (e.g. Formspree); otherwise it shows the thank-you state and says nothing was sent.
-  var pform = document.getElementById('partner-form');
-  if (pform) {
-    var errBox = pform.querySelector('.form-error');
-    var thanks = document.getElementById('form-thanks');
-    var btn = pform.querySelector('button[type="submit"]');
+  // Contact forms (partners.html #partner-form, homepage "Get in touch" strip #contact-strip-form).
+  // Static site, so each form posts to its data-endpoint if one is set (e.g. Formspree);
+  // otherwise it shows its thank-you state and says nothing was sent.
+  // Each form: data-contact-form, data-thanks="<id of thank-you element>", optional data-error="<message>".
+  // A field with data-validate="email-or-phone" accepts either an email address or a phone number.
+  var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  function fieldOk(f) {
+    var v = f.value.trim();
+    if (v === '') return false;
+    if (f.getAttribute('data-validate') === 'email-or-phone') return emailRe.test(v) || v.replace(/\D/g, '').length >= 7;
+    return f.type !== 'email' || emailRe.test(v);
+  }
+  document.querySelectorAll('form[data-contact-form]').forEach(function (cform) {
+    var errBox = cform.querySelector('.form-error');
+    var thanks = document.getElementById(cform.getAttribute('data-thanks'));
+    var btn = cform.querySelector('button[type="submit"]');
+    if (!errBox || !thanks || !btn) return; // incomplete markup: leave the form alone
+    var btnLabel = btn.textContent;
+    var errMsg = cform.getAttribute('data-error') || 'Please fill in the required fields.';
     function showThanks(note) {
-      pform.hidden = true; thanks.hidden = false;
+      cform.hidden = true; thanks.hidden = false;
       if (note) {
         var p = document.createElement('p'); p.className = 'form-note'; p.textContent = note; thanks.appendChild(p);
       }
       thanks.focus();
     }
-    pform.addEventListener('submit', function (e) {
+    cform.addEventListener('submit', function (e) {
       e.preventDefault();
       errBox.hidden = true;
       var bad = [];
-      pform.querySelectorAll('[required]').forEach(function (f) {
-        var ok = f.value.trim() !== '' && (f.type !== 'email' || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value.trim()));
+      cform.querySelectorAll('[required]').forEach(function (f) {
+        var ok = fieldOk(f);
         f.setAttribute('aria-invalid', ok ? 'false' : 'true');
         if (!ok) bad.push(f);
       });
       if (bad.length) {
-        errBox.textContent = 'Please fill in your name, a valid email, and what you are reaching out about.';
+        errBox.textContent = errMsg;
         errBox.hidden = false; bad[0].focus(); return;
       }
-      if (pform.querySelector('[name="_gotcha"]').value) return; // likely a bot
-      var endpoint = pform.getAttribute('data-endpoint');
+      var trap = cform.querySelector('[name="_gotcha"]');
+      if (trap && trap.value) return; // likely a bot
+      var endpoint = cform.getAttribute('data-endpoint');
       if (!endpoint) { showThanks('Preview note: this form is not connected yet, so nothing was sent.'); return; }
       btn.disabled = true; btn.textContent = 'Sending…';
-      fetch(endpoint, { method: 'POST', body: new FormData(pform), headers: { Accept: 'application/json' } })
+      fetch(endpoint, { method: 'POST', body: new FormData(cform), headers: { Accept: 'application/json' } })
         .then(function (r) { if (!r.ok) throw new Error(r.status); showThanks(); })
         .catch(function () {
-          btn.disabled = false; btn.textContent = 'Send message';
+          btn.disabled = false; btn.textContent = btnLabel;
           errBox.textContent = 'Sorry, your message could not be sent. Please try again or call (832) 916-4555.';
           errBox.hidden = false;
         });
     });
-  }
+  });
 
   // Partners and volunteer pages: highlight the switcher button for the section in view.
   // On the volunteer page both buttons point into the forms section, so the visible tab wins.

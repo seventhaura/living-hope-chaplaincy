@@ -56,6 +56,7 @@ Search the `.html` files for `data-todo` to find each one.
 - **Instagram** icon is a placeholder (`#`); the current site has no Instagram link. Replace or remove it.
 - **Future pages** linked from here that don't exist yet: `about.html` (Read more). Hospitals and churches now live on `partners.html` (`#hospitals`, `#churches`).
 - **Partner contact form** on `partners.html` is not connected yet (see below).
+- **Homepage "Get in touch" strip** (`index.html`, `#get-in-touch`) is not connected yet either. Steven will send who should receive these messages; set it up the same way as the partner form (put the endpoint in the form's `data-endpoint`). To remove the strip, delete the block between the `START`/`END: Get in touch strip` comments in `index.html` and the "Get in touch strip" block in `styles.css`. `script.js` needs no change.
 - **Volunteer forms** on `volunteer.html` show placeholders where the Cognito forms will go (see below).
 - **Scripture PDFs** still load from the old GoDaddy site (12–18 MB each). Compress them, add them to this repo, and update the links, so they keep working after the domain moves.
 - The hidden training page is deliberately **not** linked anywhere on this page.
